@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Artist's Abode — Borgarnes, Iceland</title>
+<meta name="description" content="A private modern guesthouse on the fjord's edge in Borgarnes, Iceland. Book directly on WhatsApp.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:   #17181A;
+    --dusk:  #435866;
+    --mist:  #EDE8DE;
+    --pine:  #33534C;
+    --birch: #AD8355;
+    --cloud: #F7F4EE;
+    --line:  rgba(247,244,238,0.28);
+  }
+
+  *{ margin:0; padding:0; box-sizing:border-box; }
+
+  html,body{ height:100%; overflow:hidden; background:var(--ink); }
+
+  body{
+    font-family:'Space Grotesk', sans-serif;
+    color:var(--cloud);
+    -webkit-font-smoothing:antialiased;
+  }
+
+  a{ color:inherit; text-decoration:none; }
+  button{ font-family:inherit; }
+
+  .mono{ font-family:'IBM Plex Mono', monospace; letter-spacing:0.02em; }
+
+  /* ---------- STAGE ---------- */
+  .stage{ position:relative; width:100vw; height:100vh; height:100dvh; background:var(--ink); }
+
+  .hero-img, .hero-img-winter{
+    position:absolute; inset:0; width:100%; height:100%;
+    object-fit:cover; object-position:center 62%;
+  }
+
+  .hero-img-winter{ z-index:1; opacity:0; }
+  .hero-img-winter.ready{ opacity:1; transition:opacity .5s ease; }
+
+  .hero-img{
+    z-index:2;
+    clip-path:circle(0% at 50% 50%);
+    animation:iris 1.5s cubic-bezier(.65,0,.35,1) 1.05s forwards;
+    filter:drop-shadow(-10px 0 18px rgba(0,0,0,.38));
+  }
+
+  @keyframes iris{
+    from{ clip-path:circle(0% at 50% 50%); }
+    to{   clip-path:circle(76% at 50% 50%); }
+  }
+
+  /* after the entrance animation completes, JS hands control to these
+     polygon states so the tear toggle can transition smoothly */
+  .hero-img.ready{
+    clip-path:polygon(0% 0%, 0% 100%, 104% 100%, 107% 87.5%, 102% 75%, 108% 62.5%, 101% 50%, 107% 37.5%, 103% 25%, 106% 12.5%, 104% 0%);
+    transform:translateX(0) rotate(0deg);
+    transition:clip-path 1.15s cubic-bezier(.6,0,.2,1), transform 1.15s cubic-bezier(.6,0,.2,1);
+  }
+
+  .hero-img.ready.torn{
+    clip-path:polygon(0% 0%, 0% 100%, -8% 100%, -5% 87.5%, -10% 75%, -4% 62.5%, -11% 50%, -5% 37.5%, -9% 25%, -6% 12.5%, -8% 0%);
+    transform:translateX(6%) rotate(2deg);
+  }
+
+  .scrim{
+    position:absolute; inset:0; z-index:5; pointer-events:none;
+    background:linear-gradient(180deg, rgba(23,24,26,0.55) 0%, rgba(23,24,26,0) 26%, rgba(23,24,26,0) 55%, rgba(23,24,26,0.72) 100%);
+    opacity:0;
+    animation:fade-in .9s ease 1.6s forwards;
+  }
+
+  /* ---------- LOADER ---------- */
+  .loader{ position:absolute; inset:0; z-index:20; display:flex; align-items:center; justify-content:center; pointer-events:none; }
+
+  .loader-mark{
+    font-size:clamp(1.4rem, 4vw, 2.1rem); font-weight:600; letter-spacing:0.5em; text-indent:0.5em;
+    opacity:0; color:var(--cloud);
+    animation:mark-in .7s ease forwards, mark-out .5s ease forwards .95s;
+  }
+
+  @keyframes mark-in{ from{ opacity:0; letter-spacing:0.9em; } to{ opacity:1; letter-spacing:0.5em; } }
+  @keyframes mark-out{ to{ opacity:0; } }
+  @keyframes fade-in{ to{ opacity:1; } }
+
+  /* ---------- CONTENT FRAME ---------- */
+  .frame{
+    position:absolute; inset:0; z-index:10;
+    display:flex; flex-direction:column; justify-content:space-between;
+    padding:clamp(20px,3.2vw,44px);
+    opacity:0; animation:fade-in 1s ease 1.75s forwards;
+  }
+
+  .topbar{ display:flex; align-items:flex-start; justify-content:space-between; padding-bottom:14px; border-bottom:1px solid var(--line); }
+  .wordmark{ font-size:clamp(0.85rem, 1.4vw, 1rem); font-weight:600; letter-spacing:0.32em; }
+  .geo{ font-size:0.72rem; text-align:right; line-height:1.5; opacity:0.85; }
+  .geo span{ display:block; }
+
+  .content-bottom{ display:flex; align-items:flex-end; justify-content:space-between; gap:32px; flex-wrap:wrap; }
+  .copy{ max-width:36rem; }
+  .eyebrow{ font-size:0.72rem; letter-spacing:0.22em; opacity:0.8; margin-bottom:14px; display:block; }
+  h1{ font-size:clamp(2.4rem, 6.2vw, 5rem); font-weight:700; line-height:0.98; letter-spacing:-0.01em; }
+  .sub{ margin-top:16px; max-width:30rem; font-size:clamp(0.9rem, 1.15vw, 1.02rem); line-height:1.55; opacity:0.88; }
+
+  .actions{ display:flex; flex-direction:column; align-items:flex-end; gap:14px; flex-shrink:0; }
+  .btn{
+    display:inline-flex; align-items:center; gap:10px; padding:14px 22px;
+    font-size:0.86rem; font-weight:600; letter-spacing:0.03em; white-space:nowrap;
+    border:1px solid var(--cloud);
+    transition:background .25s ease, color .25s ease, border-color .25s ease, transform .2s ease;
+  }
+  .btn:active{ transform:scale(0.97); }
+  .btn-primary{ background:var(--pine); border-color:var(--pine); color:var(--cloud); }
+  .btn-primary:hover{ background:#284741; border-color:#284741; }
+  .btn-ghost{ background:transparent; color:var(--cloud); }
+  .btn-ghost:hover{ background:var(--cloud); color:var(--ink); }
+  .btn svg{ width:16px; height:16px; flex-shrink:0; }
+
+  a:focus-visible, .btn:focus-visible, .cord:focus-visible, .views__item:focus-visible{ outline:2px solid var(--cloud); outline-offset:3px; }
+
+  /* ---------- WINTER PULL-CORD ---------- */
+  .cord{
+    position:absolute; right:clamp(18px,3vw,40px); top:16%; z-index:12;
+    display:flex; flex-direction:column; align-items:center;
+    background:none; border:none; padding:0; cursor:pointer; color:inherit;
+    opacity:0; animation:fade-in 1s ease 2.05s forwards;
+  }
+  .cord__string{ width:1px; height:clamp(70px,12vh,120px); background:var(--line); }
+  .cord__knob{
+    margin-top:-1px; width:42px; height:42px; border-radius:50%;
+    background:var(--pine); border:1px solid var(--cloud);
+    display:flex; align-items:center; justify-content:center;
+    box-shadow:0 6px 16px rgba(0,0,0,.4);
+    transition:transform .25s ease, background .25s ease;
+  }
+  .cord:hover .cord__knob{ transform:translateY(5px); background:#284741; }
+  .cord.pulled .cord__knob{ animation:knob-pull .55s cubic-bezier(.34,1.56,.64,1); }
+  @keyframes knob-pull{ 0%{transform:translateY(0);} 40%{transform:translateY(16px);} 100%{transform:translateY(0);} }
+  .cord__knob svg{ width:17px; height:17px; }
+  .cord__knob .icon-snow{ display:none; }
+  .cord.is-winter .cord__knob .icon-sun{ display:none; }
+  .cord.is-winter .cord__knob .icon-snow{ display:block; }
+  .cord__label{
+    margin-top:11px; writing-mode:vertical-rl; font-size:0.6rem; letter-spacing:0.28em; opacity:0.65;
+  }
+
+  /* ---------- VIEWS GALLERY (round window stack) ---------- */
+  .views{
+    position:absolute; left:clamp(16px,3vw,32px); top:50%; transform:translateY(-50%);
+    z-index:12; display:flex; flex-direction:column; align-items:flex-start;
+    opacity:0; animation:fade-in 1s ease 2.2s forwards;
+  }
+  .views__label{
+    writing-mode:vertical-rl; transform:rotate(180deg); font-size:0.6rem; letter-spacing:0.28em; opacity:0.65;
+    margin-bottom:14px; margin-left:18px;
+  }
+  .views__item{
+    width:58px; height:58px; border-radius:50%; border:2px solid var(--cloud);
+    background-size:cover; background-position:center; overflow:hidden;
+    cursor:pointer; box-shadow:0 8px 18px rgba(0,0,0,.4);
+    transition:transform .25s ease;
+  }
+  .views__item + .views__item{ margin-top:-14px; }
+  .views__item:nth-child(2){ transform:translateX(10px) rotate(-5deg); }
+  .views__item:nth-child(3){ transform:translateX(-4px) rotate(4deg); }
+  .views__item:nth-child(4){ transform:translateX(14px) rotate(-3deg); }
+  .views__item:hover{ transform:translateX(20px) scale(1.08) rotate(0deg); z-index:5; }
+
+  /* ---------- LIGHTBOX ---------- */
+  .lightbox{
+    position:fixed; inset:0; z-index:60; background:rgba(15,16,17,.94);
+    display:flex; align-items:center; justify-content:center;
+    opacity:0; pointer-events:none; transition:opacity .3s ease;
+  }
+  .lightbox.open{ opacity:1; pointer-events:auto; }
+  .lightbox__img{ max-width:88vw; max-height:78vh; object-fit:contain; box-shadow:0 24px 70px rgba(0,0,0,.55); }
+  .lightbox__close, .lightbox__nav{
+    position:absolute; background:none; border:none; color:var(--cloud); cursor:pointer;
+    display:flex; align-items:center; justify-content:center;
+    width:44px; height:44px; opacity:0.8; transition:opacity .2s ease;
+  }
+  .lightbox__close:hover, .lightbox__nav:hover{ opacity:1; }
+  .lightbox__close{ top:18px; right:20px; }
+  .lightbox__close svg{ width:20px; height:20px; }
+  .lightbox__nav svg{ width:26px; height:26px; }
+  .lightbox__nav--prev{ left:10px; top:50%; transform:translateY(-50%); }
+  .lightbox__nav--next{ right:10px; top:50%; transform:translateY(-50%); }
+  .lightbox__count{
+    position:absolute; bottom:24px; left:50%; transform:translateX(-50%);
+    font-size:0.72rem; opacity:0.75;
+  }
+
+  /* ---------- RESPONSIVE ---------- */
+  @media (max-width:640px){
+    .geo{ display:none; }
+    .content-bottom{ flex-direction:column; align-items:flex-start; gap:22px; }
+    .actions{ align-items:flex-start; width:100%; }
+    .btn{ width:100%; justify-content:center; }
+
+    .cord{ right:14px; top:18px; flex-direction:row-reverse; }
+    .cord__string{ display:none; }
+    .cord__label{ writing-mode:horizontal-tb; margin-top:0; margin-right:8px; }
+
+    .views{ left:14px; top:18px; transform:none; flex-direction:row; align-items:center; }
+    .views__label{ writing-mode:horizontal-tb; transform:none; margin-bottom:0; margin-left:0; margin-right:8px; }
+    .views__item{ width:34px; height:34px; }
+    .views__item + .views__item{ margin-top:0; margin-left:-10px; }
+    .views__item:nth-child(2){ transform:translateY(4px) rotate(-5deg); }
+    .views__item:nth-child(3){ transform:translateY(-3px) rotate(4deg); }
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    .hero-img{ animation:none; clip-path:circle(76% at 50% 50%); }
+    .hero-img.ready{ transition:none; }
+    .loader-mark, .scrim, .frame, .cord, .views{ animation:none; opacity:1; }
+  }
+</style>
+</head>
+<body>
+
+<div class="stage">
+  <img class="hero-img-winter" src="hero-winter.jpg" alt="The same house in winter, snow covering the hedges and garden, warm light in the windows, mountains across the fjord dusted white.">
+  <img class="hero-img" src="hero.jpg" alt="A modern single-story guesthouse with cream and teal siding, dark stone accents, set on a green hillside above a fjord, with mountains and a wide evening sky in the background.">
+  <div class="scrim"></div>
+
+  <div class="loader" aria-hidden="true">
+    <span class="loader-mark mono">ARTIST&rsquo;S&nbsp;ABODE</span>
+  </div>
+
+  <!-- winter pull-cord -->
+  <button class="cord" id="cord" type="button" aria-label="Toggle winter view">
+    <span class="cord__string"></span>
+    <span class="cord__knob">
+      <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.5v3M12 18.5v3M21.5 12h-3M5.5 12h-3M18.36 5.64l-2.12 2.12M7.76 16.24l-2.12 2.12M18.36 18.36l-2.12-2.12M7.76 7.76 5.64 5.64"/></svg>
+      <svg class="icon-snow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M12 2v20M4.9 6.5l14.2 11M4.9 17.5l14.2-11M8 3.6 12 6l4-2.4M8 20.4 12 18l4 2.4M2.6 9l3.4 3-3.4 3M21.4 9l-3.4 3 3.4 3"/></svg>
+    </span>
+    <span class="cord__label mono">SEASON</span>
+  </button>
+
+  <!-- interior views gallery -->
+  <div class="views">
+    <span class="views__label mono">VIEWS</span>
+    <button class="views__item" style="background-image:url('view1.jpg')" data-index="0" aria-label="Open photo: sunset over the fjord from the living room window"></button>
+    <button class="views__item" style="background-image:url('view2.jpg')" data-index="1" aria-label="Open photo: evening light over the water from the window"></button>
+    <button class="views__item" style="background-image:url('view3.jpg')" data-index="2" aria-label="Open photo: the house at dusk beside the fjord"></button>
+  </div>
+
+  <div class="frame">
+    <div class="topbar">
+      <div class="wordmark">ARTIST&rsquo;S ABODE</div>
+      <div class="geo mono">
+        <span>64.5367&deg; N, 21.9238&deg; W</span>
+        <span>BORGARNES, ICELAND</span>
+      </div>
+    </div>
+
+    <div class="content-bottom">
+      <div class="copy">
+        <span class="eyebrow mono">PRIVATE GUESTHOUSE · ONE PARTY AT A TIME</span>
+        <h1>Artist&rsquo;s&nbsp;Abode</h1>
+        <p class="sub">A quiet modern house on the water&rsquo;s edge — long light, wide skies, and nothing between you and the fjord.</p>
+      </div>
+
+      <div class="actions">
+        <a class="btn btn-primary" href="https://wa.me/3540000000?text=Hi!%20I%27d%20like%20to%20book%20a%20stay%20at%20Artist%27s%20Abode." target="_blank" rel="noopener">
+          <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12.04 2c-5.5 0-9.96 4.46-9.96 9.96 0 1.76.46 3.48 1.34 5L2 22l5.2-1.36a9.94 9.94 0 0 0 4.84 1.23h.01c5.5 0 9.96-4.46 9.96-9.96S17.54 2 12.04 2Zm5.8 14.24c-.24.68-1.4 1.3-1.94 1.38-.5.08-1.12.11-1.8-.11-.42-.13-.95-.31-1.64-.6-2.88-1.24-4.76-4.14-4.9-4.33-.14-.19-1.17-1.56-1.17-2.98 0-1.42.75-2.12 1.02-2.41.27-.29.58-.36.78-.36.2 0 .39 0 .56.01.18.01.42-.07.65.5.24.58.82 2 .89 2.15.07.15.12.32.02.51-.1.19-.15.31-.3.48-.15.17-.31.38-.44.51-.15.15-.3.31-.13.6.17.29.76 1.25 1.63 2.02 1.12 1 2.06 1.31 2.35 1.46.29.15.46.13.63-.08.17-.21.72-.84.91-1.13.19-.29.38-.24.63-.14.26.1 1.66.78 1.94.92.29.14.48.21.55.33.07.12.07.68-.17 1.36Z"/></svg>
+          Book on WhatsApp
+        </a>
+        <a class="btn btn-ghost" href="https://www.google.com/maps/place/Extraordinary+Lodging+an+Artists+Abode/@64.5375109,-21.9158295,17z/data=!3m1!4b1!4m6!3m5!1s0x48d5c89f77a28767:0x7e0ef54a647f32b2!8m2!3d64.5375109!4d-21.9158295!16s%2Fg%2F11g6yj7fm5?entry=ttu&g_ep=EgoyMDI2MDcxNS4wIKXMDSoASAFQAw%3D%3D" target="_blank" rel="noopener">
+          View on map
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7M8 7h9v9"/></svg>
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- lightbox -->
+<div class="lightbox" id="lightbox" aria-hidden="true">
+  <button class="lightbox__close" id="lbClose" type="button" aria-label="Close">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 5l14 14M19 5 5 19"/></svg>
+  </button>
+  <button class="lightbox__nav lightbox__nav--prev" id="lbPrev" type="button" aria-label="Previous photo">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6 6 6"/></svg>
+  </button>
+  <img class="lightbox__img" id="lbImg" src="" alt="">
+  <button class="lightbox__nav lightbox__nav--next" id="lbNext" type="button" aria-label="Next photo">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>
+  </button>
+  <span class="lightbox__count mono" id="lbCount"></span>
+</div>
+
+<script>
+(function(){
+  var heroSummer = document.querySelector('.hero-img');
+  var heroWinter = document.querySelector('.hero-img-winter');
+  var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  function activateReady(){
+    heroSummer.style.animation = 'none';
+    heroSummer.classList.add('ready');
+    heroWinter.classList.add('ready');
+  }
+
+  if(reduceMotion){
+    activateReady();
+  } else {
+    heroSummer.addEventListener('animationend', function(e){
+      if(e.animationName === 'iris'){ activateReady(); }
+    });
+  }
+
+  var cord = document.getElementById('cord');
+  var isWinter = false;
+  cord.addEventListener('click', function(){
+    isWinter = !isWinter;
+    cord.classList.add('pulled');
+    setTimeout(function(){ cord.classList.remove('pulled'); }, 550);
+    cord.classList.toggle('is-winter', isWinter);
+    heroSummer.classList.toggle('torn', isWinter);
+  });
+
+  var photos = [
+    { src:'view1.jpg', alt:'Sunset over the fjord and mountains, seen through the living room window.' },
+    { src:'view2.jpg', alt:'Evening light on the water, seen from an upstairs window.' },
+    { src:'view3.jpg', alt:'The house at dusk beside the still fjord water.' }
+  ];
+  var current = 0;
+  var lightbox = document.getElementById('lightbox');
+  var lbImg = document.getElementById('lbImg');
+  var lbCount = document.getElementById('lbCount');
+
+  function renderLB(){
+    lbImg.src = photos[current].src;
+    lbImg.alt = photos[current].alt;
+    lbCount.textContent = ('0'+(current+1)).slice(-2) + ' — 0' + photos.length;
+  }
+  function openLB(i){
+    current = i; renderLB();
+    lightbox.classList.add('open');
+    lightbox.setAttribute('aria-hidden','false');
+  }
+  function closeLB(){
+    lightbox.classList.remove('open');
+    lightbox.setAttribute('aria-hidden','true');
+  }
+  function next(){ current = (current+1) % photos.length; renderLB(); }
+  function prev(){ current = (current-1+photos.length) % photos.length; renderLB(); }
+
+  document.querySelectorAll('.views__item').forEach(function(btn){
+    btn.addEventListener('click', function(){ openLB(parseInt(btn.dataset.index,10)); });
+  });
+  document.getElementById('lbClose').addEventListener('click', closeLB);
+  document.getElementById('lbNext').addEventListener('click', next);
+  document.getElementById('lbPrev').addEventListener('click', prev);
+  lightbox.addEventListener('click', function(e){ if(e.target === lightbox){ closeLB(); } });
+  document.addEventListener('keydown', function(e){
+    if(!lightbox.classList.contains('open')) return;
+    if(e.key === 'Escape') closeLB();
+    if(e.key === 'ArrowRight') next();
+    if(e.key === 'ArrowLeft') prev();
+  });
+})();
+</script>
+
+</body>
+</html>
