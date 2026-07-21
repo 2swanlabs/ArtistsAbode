@@ -208,12 +208,14 @@
     .cord__string{ display:none; }
     .cord__label{ writing-mode:horizontal-tb; margin-top:0; margin-right:8px; }
 
-    .views{ left:14px; top:18px; transform:none; flex-direction:row; align-items:center; }
-    .views__label{ writing-mode:horizontal-tb; transform:none; margin-bottom:0; margin-left:0; margin-right:8px; }
+    .views{ left:auto; right:14px; top:72px; transform:none; flex-direction:column; align-items:center; }
+    .views__label{ writing-mode:vertical-rl; transform:rotate(180deg); margin-bottom:8px; margin-left:0; margin-right:0; }
     .views__item{ width:34px; height:34px; }
-    .views__item + .views__item{ margin-top:0; margin-left:-10px; }
-    .views__item:nth-child(2){ transform:translateY(4px) rotate(-5deg); }
-    .views__item:nth-child(3){ transform:translateY(-3px) rotate(4deg); }
+    .views__item + .views__item{ margin-top:-9px; }
+    .views__item:nth-child(2){ transform:none; }
+    .views__item:nth-child(3){ transform:none; }
+    .views__item:nth-child(4){ transform:none; }
+    .views__item:hover{ transform:scale(1.08); }
   }
 
   @media (prefers-reduced-motion: reduce){
